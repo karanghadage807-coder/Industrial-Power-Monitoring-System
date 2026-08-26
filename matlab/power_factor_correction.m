@@ -2,36 +2,62 @@ clc;
 clear;
 close all;
 
+%% ============================================================
+%  INDUSTRIAL POWER MONITORING SYSTEM
+%  Power Factor Correction Analysis
+%
+%  Assumption:
+%  Capacitor bank is modeled using uniform 25-kVAR
+%  switching steps.
+%% ============================================================
 
-%% System Parameters
 
-P_total = 650;
+%% ============================================================
+%  1. SYSTEM PARAMETERS
+%% ============================================================
 
-Q_total = 380.122;
+P_total = 650;          % Total active power (kW)
+Q_total = 380.122;      % Total reactive power (kVAR)
+
+V = 415;                % LV line voltage (V)
+
+transformer_rating = 1000;  % Transformer rating (kVA)
+
+PF_target = 0.95;       % Desired target power factor
+
+capacitor_step = 25;    % Capacitor switching step (kVAR)
+
+max_bank_kvar = 500;    % Maximum available capacitor bank (kVAR)
+
+
+%% ============================================================
+%  2. ORIGINAL APPARENT POWER
+%% ============================================================
 
 S_original = sqrt( ...
     P_total^2 + Q_total^2);
 
 
-%% Original Power Factor
+%% ============================================================
+%  3. ORIGINAL POWER FACTOR
+%% ============================================================
 
 PF_original = ...
     P_total / S_original;
 
 
-%% Target Power Factor
-
-PF_target = 0.95;
-
-
-%% Angles
+%% ============================================================
+%  4. CALCULATE INITIAL AND TARGET ANGLES
+%% ============================================================
 
 phi_initial = acos(PF_original);
 
 phi_target = acos(PF_target);
 
 
-%% Required Capacitor
+%% ============================================================
+%  5. THEORETICAL REQUIRED CAPACITOR kVAR
+%% ============================================================
 
 Q_required = ...
     P_total * ...
@@ -39,104 +65,273 @@ Q_required = ...
      tan(phi_target));
 
 
-%% Selected Practical Capacitor
+%% ============================================================
+%  6. SELECT SMALLEST PRACTICAL CAPACITOR BANK
+%
+%  The controller tests:
+%
+%  25, 50, 75, 100, 125, ...
+%
+%  and selects the smallest capacitor bank
+%  that achieves the target PF.
+%% ============================================================
 
-Q_capacitor = 125;
+Q_capacitor = NaN;
+
+for Qc = capacitor_step:capacitor_step:max_bank_kvar
+
+    % Reactive power after applying this capacitor
+    Q_test = Q_total - Qc;
+
+    % Apparent power after compensation
+    S_test = sqrt( ...
+        P_total^2 + Q_test^2);
+
+    % Power factor after compensation
+    PF_test = ...
+        P_total / S_test;
+
+    % Select the first capacitor size
+    % that achieves the target PF
+    if PF_test >= PF_target
+
+        Q_capacitor = Qc;
+
+        break;
+
+    end
+
+end
 
 
-%% New Reactive Power
+%% ============================================================
+%  7. CHECK WHETHER TARGET PF IS ACHIEVABLE
+%% ============================================================
+
+if isnan(Q_capacitor)
+
+    error( ...
+        ['Target PF cannot be achieved with ' ...
+         'the available capacitor bank.']);
+
+end
+
+
+%% ============================================================
+%  8. CHECK MAXIMUM AVAILABLE CAPACITOR BANK
+%% ============================================================
+
+if Q_capacitor > max_bank_kvar
+
+    error( ...
+        ['Required capacitor bank exceeds ' ...
+         'the maximum available capacity.']);
+
+end
+
+
+%% ============================================================
+%  9. CALCULATE OVERCOMPENSATION
+%% ============================================================
+
+overcompensation = ...
+    Q_capacitor - Q_required;
+
+
+%% ============================================================
+%  10. NEW REACTIVE POWER
+%% ============================================================
 
 Q_new = ...
     Q_total - Q_capacitor;
 
 
-%% New Apparent Power
+%% ============================================================
+%  11. DETERMINE POWER FACTOR CONDITION
+%% ============================================================
+
+if Q_new > 0
+
+    compensation_status = 'Lagging';
+
+elseif Q_new < 0
+
+    compensation_status = 'Leading';
+
+else
+
+    compensation_status = 'Unity PF';
+
+end
+
+
+%% ============================================================
+%  12. NEW APPARENT POWER
+%% ============================================================
 
 S_new = sqrt( ...
     P_total^2 + Q_new^2);
 
 
-%% New Power Factor
+%% ============================================================
+%  13. ACTUAL ACHIEVED POWER FACTOR
+%% ============================================================
 
 PF_new = ...
     P_total / S_new;
 
 
-%% Current
+%% ============================================================
+%  14. TARGET PF CHECK
+%% ============================================================
 
-V = 415;
+if PF_new >= PF_target
 
+    PF_status = 'Target PF achieved';
+
+else
+
+    PF_status = 'Target PF not achieved';
+
+end
+
+
+%% ============================================================
+%  15. CAPACITOR BANK UTILIZATION
+%% ============================================================
+
+capacitor_utilization = ...
+    (Q_capacitor / max_bank_kvar) * 100;
+
+
+%% ============================================================
+%  16. CURRENT BEFORE PF CORRECTION
+%% ============================================================
 
 I_before = ...
     S_original * 1000 / ...
     (sqrt(3) * V);
 
 
+%% ============================================================
+%  17. CURRENT AFTER PF CORRECTION
+%% ============================================================
+
 I_after = ...
     S_new * 1000 / ...
     (sqrt(3) * V);
 
 
-%% Transformer Loading
-
-transformer_rating = 1000;
-
-
-loading_before = ...
-    S_original / transformer_rating * 100;
-
-
-loading_after = ...
-    S_new / transformer_rating * 100;
-
-
-%% Current Reduction
+%% ============================================================
+%  18. CURRENT REDUCTION
+%% ============================================================
 
 current_reduction = ...
     (I_before - I_after) ...
     / I_before * 100;
 
 
-%% Display Results
+%% ============================================================
+%  19. TRANSFORMER LOADING BEFORE CORRECTION
+%% ============================================================
 
-fprintf('\nPower Factor Correction\n');
-fprintf('-----------------------\n');
+loading_before = ...
+    S_original / ...
+    transformer_rating * 100;
 
-fprintf('Original PF = %.3f\n', ...
+
+%% ============================================================
+%  20. TRANSFORMER LOADING AFTER CORRECTION
+%% ============================================================
+
+loading_after = ...
+    S_new / ...
+    transformer_rating * 100;
+
+
+%% ============================================================
+%  21. DISPLAY RESULTS
+%% ============================================================
+
+fprintf('\n');
+fprintf('=============================================\n');
+fprintf('       POWER FACTOR CORRECTION ANALYSIS\n');
+fprintf('=============================================\n');
+
+fprintf('\n');
+
+fprintf('Active Power                 : %.2f kW\n', ...
+    P_total);
+
+fprintf('Original Reactive Power     : %.2f kVAR\n', ...
+    Q_total);
+
+fprintf('Original Apparent Power     : %.2f kVA\n', ...
+    S_original);
+
+fprintf('Original Power Factor       : %.3f\n', ...
     PF_original);
 
-fprintf('Target PF = %.3f\n', ...
+fprintf('\n');
+
+fprintf('Target Power Factor         : %.3f\n', ...
     PF_target);
 
-fprintf('Required Capacitor = %.2f kVAR\n', ...
+fprintf('Required Capacitor          : %.2f kVAR\n', ...
     Q_required);
 
-fprintf('Selected Capacitor = %.2f kVAR\n', ...
+fprintf('Selected Practical Capacitor: %.2f kVAR\n', ...
     Q_capacitor);
 
-fprintf('New Reactive Power = %.2f kVAR\n', ...
+fprintf('Overcompensation            : %.2f kVAR\n', ...
+    overcompensation);
+
+fprintf('\n');
+
+fprintf('New Reactive Power          : %.2f kVAR\n', ...
     Q_new);
 
-fprintf('New Apparent Power = %.2f kVA\n', ...
+fprintf('New Apparent Power          : %.2f kVA\n', ...
     S_new);
 
-fprintf('New PF = %.3f\n', ...
+fprintf('Actual Achieved PF          : %.3f\n', ...
     PF_new);
 
-fprintf('Current Before = %.2f A\n', ...
+fprintf('Power Factor Condition      : %s\n', ...
+    compensation_status);
+
+fprintf('PF Status                   : %s\n', ...
+    PF_status);
+
+fprintf('Capacitor Bank Utilization  : %.2f %%\n', ...
+    capacitor_utilization);
+
+fprintf('\n');
+
+fprintf('Current Before Correction   : %.2f A\n', ...
     I_before);
 
-fprintf('Current After = %.2f A\n', ...
+fprintf('Current After Correction    : %.2f A\n', ...
     I_after);
 
-fprintf('Current Reduction = %.2f %%\n', ...
+fprintf('Current Reduction           : %.2f %%\n', ...
     current_reduction);
 
-fprintf('Loading Before = %.2f %%\n', ...
+fprintf('\n');
+
+fprintf('Transformer Loading Before  : %.2f %%\n', ...
     loading_before);
 
-fprintf('Loading After = %.2f %%\n', ...
+fprintf('Transformer Loading After   : %.2f %%\n', ...
     loading_after);
+
+fprintf('\n');
+fprintf('=============================================\n');
+
+
+%% ============================================================
+%  22. FIGURE 1 - APPARENT POWER
+%% ============================================================
 
 figure;
 
@@ -154,9 +349,14 @@ xticklabels({
 
 ylabel('Apparent Power (kVA)');
 
-title('Effect of Power Factor Correction');
+title('Effect of Power Factor Correction on Apparent Power');
 
 grid on;
+
+
+%% ============================================================
+%  23. FIGURE 2 - CURRENT
+%% ============================================================
 
 figure;
 
@@ -178,6 +378,11 @@ title('Effect of Power Factor Correction on LV Current');
 
 grid on;
 
+
+%% ============================================================
+%  24. FIGURE 3 - TRANSFORMER LOADING
+%% ============================================================
+
 figure;
 
 values = [
@@ -198,4 +403,42 @@ title('Effect of PF Correction on Transformer Loading');
 
 grid on;
 
-yline(100, '--');
+hold on;
+
+yline(100, '--', '100% Rating');
+
+hold off;
+
+
+%% ============================================================
+%  25. FIGURE 4 - POWER FACTOR
+%% ============================================================
+
+figure;
+
+values = [
+    PF_original
+    PF_new
+];
+
+bar(values);
+
+xticklabels({
+    'Before PF Correction'
+    'After PF Correction'
+});
+
+ylabel('Power Factor');
+
+title('Effect of Power Factor Correction on Power Factor');
+
+ylim([0 1.05]);
+
+grid on;
+
+hold on;
+
+yline(PF_target, '--', ...
+    'Target PF');
+
+hold off;

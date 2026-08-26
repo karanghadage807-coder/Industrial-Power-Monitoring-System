@@ -1,0 +1,8 @@
+parameter,value
+rated_power_kva,1000
+primary_voltage_kv,11
+secondary_voltage_v,415
+frequency_hz,50
+impedance_percent,6
+core_loss_kw,2.5
+copper_loss_rated_kw,10

@@ -1,0 +1,6 @@
+load_id,load_name,p_kw,pf,voltage_v,operating_hours,load_factor
+1,Motor_1,200,0.85,415,16,0.80
+2,Motor_2,150,0.82,415,14,0.75
+3,Pump,100,0.88,415,12,0.70
+4,Compressor,120,0.86,415,10,0.75
+5,Auxiliary,80,0.95,415,16,0.60

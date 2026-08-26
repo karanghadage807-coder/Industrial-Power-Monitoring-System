@@ -1,0 +1,4 @@
+parameter,value,unit
+target_pf,0.95,-
+selected_capacity_kvar,125,kVAR
+lv_voltage,415,V

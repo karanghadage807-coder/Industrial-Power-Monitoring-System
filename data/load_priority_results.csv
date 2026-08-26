@@ -1,0 +1,6 @@
+Load,P_kW,Q_kVAR,S_kVA,PF,Phase_Angle_deg,Voltage_V,Current_A,PF_Condition,P_Contribution_%,Q_Contribution_%,Reactive_Power_Rank,PF_Priority,Priority_Score,Overall_Rank
+Motor_2,150.0,104.7,182.93,0.82,34.92,415.0,254.49,Poor,23.08,27.54,2,High,18.846000000000007,1
+Motor_1,200.0,123.95,235.29,0.85,31.79,415.0,327.34,Poor,30.77,32.61,1,High,18.592500000000005,2
+Compressor,120.0,71.2,139.53,0.86,30.68,415.0,194.12,Poor,18.46,18.73,3,High,9.968000000000002,3
+Pump,100.0,53.97,113.64,0.88,28.36,415.0,158.09,Poor,15.38,14.2,4,High,6.4764,4
+Auxiliary,80.0,26.29,84.21,0.95,18.19,415.0,117.15,Good,12.31,6.92,5,Low,1.3145000000000011,5

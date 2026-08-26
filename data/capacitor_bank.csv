@@ -1,4 +1,4 @@
 parameter,value,unit
 target_pf,0.95,-
-selected_capacity_kvar,125,kVAR
-lv_voltage,415,V
+capacitor_step_kvar,25,kVAR
+max_bank_kvar,500,kVAR

@@ -1,0 +1,6 @@
+Load,PF,Q_kVAR,Priority,Priority_Score,Reason,Recommendation
+Motor_2,0.82,104.7,High,18.846000000000007,Low power factor and high reactive power consumption,High priority for power factor correction
+Motor_1,0.85,123.95,High,18.592500000000005,Moderately low power factor,Consider power factor correction
+Compressor,0.86,71.2,High,9.968000000000002,Moderately low power factor,Consider power factor correction
+Pump,0.88,53.97,High,6.4764,Moderately low power factor,Consider power factor correction
+Auxiliary,0.95,26.29,Low,1.3145000000000011,Acceptable electrical performance,No immediate PF correction required

@@ -90,3 +90,29 @@ print(
     f"Total Monthly Energy : "
     f"{total_monthly_energy:.2f} kWh"
 )
+
+# -----------------------------------
+# Save energy analysis results
+# -----------------------------------
+
+OUTPUT_FILE = BASE_DIR / "data" / "energy_analysis_results.csv"
+
+loads[
+    [
+        "load_name",
+        "p_kw",
+        "load_factor",
+        "operating_hours",
+        "average_power_kw",
+        "daily_energy_kwh",
+        "monthly_energy_kwh"
+    ]
+].to_csv(
+    OUTPUT_FILE,
+    index=False
+)
+
+print(
+    f"\nEnergy analysis results saved to:\n"
+    f"{OUTPUT_FILE}"
+)

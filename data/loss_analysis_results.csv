@@ -1,0 +1,18 @@
+Parameter,Value,Unit
+Active Power,650.0,kW
+Original Reactive Power,380.11,kVAR
+Original Apparent Power,752.9831419759676,kVA
+Original Power Factor,0.8632331373240034,
+Target Power Factor,0.95,
+Selected Capacitor,175.0,kVAR
+New Reactive Power,205.11,kVAR
+New Apparent Power,681.5938028620859,kVA
+Achieved Power Factor,0.9536471682556089,
+Current Before,1047.5542643736749,A
+Current After,948.2370254467614,A
+Copper Loss Before,65.84219620844827,kW
+Copper Loss After,53.94920738568732,kW
+Loss Reduction,11.892988822760948,kW
+Loss Reduction Percent,18.062867746861315,%
+Transformer Loading Before,75.29831419759677,%
+Transformer Loading After,68.15938028620859,%

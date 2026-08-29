@@ -1,0 +1,6 @@
+load_name,p_kw,load_factor,operating_hours,average_power_kw,daily_energy_kwh,monthly_energy_kwh
+Motor_1,200,0.8,16,160.0,2560.0,76800.0
+Motor_2,150,0.75,14,112.5,1575.0,47250.0
+Pump,100,0.7,12,70.0,840.0,25200.0
+Compressor,120,0.75,10,90.0,900.0,27000.0
+Auxiliary,80,0.6,16,48.0,768.0,23040.0

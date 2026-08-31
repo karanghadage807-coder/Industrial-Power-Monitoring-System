@@ -8,8 +8,7 @@ The project combines electrical engineering calculations with Python, Pandas, an
 
 ## Live Demo
 
-🚀 **Streamlit Dashboard:**  
-https://industrial-power-monitoring-system-6ddbt7sfjkcmtdaraowkrs.streamlit.app/
+🚀 **[Open the Streamlit Dashboard](https://industrial-power-monitoring-system-6ddbt7sfjkcmtdaraowkrs.streamlit.app/)**
 
 The live dashboard provides interactive analysis of industrial loads, power factor correction, transformer loading, energy consumption, electrical losses, and engineering recommendations.
 
